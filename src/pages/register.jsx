@@ -1,10 +1,46 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
-import { Eye, EyeOff, Mail, Lock } from "lucide-react";
+import { Eye, EyeOff, Mail, Lock, User } from "lucide-react";
+import { useNavigate } from "react-router-dom";
+import api from "../services/api";
 
 export default function Register() {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const navigate = useNavigate();
+  const [form, setForm] = useState({
+    username: "",
+    email: "",
+    password: "",
+    confirmPassword: "",
+  });
+  const handleChange = (e) => {
+  setForm({
+    ...form,
+    [e.target.name]: e.target.value,
+  });
+};
+
+const handleRegister = async () => {
+  if (form.password !== form.confirmPassword) {
+    alert("Password dan confirm password tidak sama");
+    return;
+  }
+
+  try {
+    await api.post("/auth/register", {
+      username: form.username,
+      email: form.email,
+      password: form.password,
+    });
+
+    alert("Register berhasil");
+    navigate("/login");
+  } catch (error) {
+    alert(error.response?.data?.message || "Register gagal");
+  }
+};
+
 
   return (
     <div
@@ -191,6 +227,59 @@ export default function Register() {
               />
             </div>
 
+            {/* Username */}
+            <div style={{ marginBottom: "10px" }}>
+              <label
+                style={{
+                  display: "block",
+                  fontSize: "11px",
+                  fontWeight: 700,
+                  color: "#334155",
+                  marginBottom: "4px",
+                  paddingLeft: "2px",
+                }}
+              >
+                Username
+              </label>
+
+              <div className="relative flex items-center">
+                <User
+                  className="absolute"
+                  style={{
+                    left: "12px",
+                    width: "16px",
+                    height: "16px",
+                    color: "#64748b",
+                  }}
+                />
+
+                <input
+                  name="username"
+                  value={form.username}
+                  onChange={handleChange}
+                  type="text"
+                  placeholder="Enter your username"
+                  style={{
+                    width: "100%",
+                    paddingLeft: "36px",
+                    paddingRight: "16px",
+                    paddingTop: "9px",
+                    paddingBottom: "9px",
+                    background: "rgba(255,255,255,0.9)",
+                    border: "1px solid #cbd5e1",
+                    borderRadius: "12px",
+                    fontSize: "13px",
+                    color: "#111827",
+                    outline: "none",
+                    fontFamily: "inherit",
+                    transition: "all 0.2s",
+                  }}
+                  onFocus={(e) => (e.target.style.borderColor = "#22c55e")}
+                  onBlur={(e) => (e.target.style.borderColor = "#cbd5e1")}
+                />
+              </div>
+            </div>
+
             {/* Email */}
             <div style={{ marginBottom: "10px" }}>
               <label
@@ -216,6 +305,9 @@ export default function Register() {
                   }}
                 />
                 <input
+                  name="email"
+                  value={form.email}
+                  onChange={handleChange}
                   type="email"
                   placeholder="name@example.com"
                   style={{
@@ -264,6 +356,9 @@ export default function Register() {
                   }}
                 />
                 <input
+                  name="password"
+                  value={form.password}
+                  onChange={handleChange}
                   type={showPassword ? "text" : "password"}
                   placeholder="••••••••"
                   style={{
@@ -331,8 +426,11 @@ export default function Register() {
                   }}
                 />
                 <input
+                  name="confirmPassword"
                   type={showConfirmPassword ? "text" : "password"}
                   placeholder="••••••••"
+                  value={form.confirmPassword}
+                  onChange={handleChange}
                   style={{
                     width: "100%",
                     paddingLeft: "36px",
@@ -421,6 +519,7 @@ export default function Register() {
 
             {/* Register Button */}
             <button
+              onClick={handleRegister}
               style={{
                 width: "100%",
                 background: "linear-gradient(135deg,#22c55e,#16a34a)",

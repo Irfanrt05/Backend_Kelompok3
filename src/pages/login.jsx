@@ -1,9 +1,41 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { Eye, EyeOff, Mail, Lock } from "lucide-react";
+import { useNavigate } from "react-router-dom";
+import api from "../services/api";
 
 export default function Login() {
   const [showPassword, setShowPassword] = useState(false);
+const navigate = useNavigate();
+
+const [form, setForm] = useState({
+  email: "",
+  password: "",
+});
+
+const handleChange = (e) => {
+  setForm({
+    ...form,
+    [e.target.name]: e.target.value,
+  });
+};
+
+const handleLogin = async () => {
+  try {
+    const res = await api.post("/auth/login", form);
+
+    localStorage.setItem("token", res.data.token);
+    localStorage.setItem("user", JSON.stringify(res.data.user));
+
+    if (res.data.user.role === "admin") {
+      navigate("/admin");
+    } else {
+      navigate("/");
+    }
+  } catch (error) {
+    alert(error.response?.data?.message || "Login gagal");
+  }
+};
 
   return (
     <div
@@ -214,6 +246,9 @@ export default function Login() {
                   }}
                 />
                 <input
+                  name="email"
+                  value={form.email}
+                  onChange={handleChange}
                   type="email"
                   placeholder="name@example.com"
                   style={{
@@ -262,6 +297,9 @@ export default function Login() {
                   }}
                 />
                 <input
+                  name="password"
+                  value={form.password}
+                  onChange={handleChange}
                   type={showPassword ? "text" : "password"}
                   placeholder="••••••••"
                   style={{
@@ -352,6 +390,7 @@ export default function Login() {
 
             {/* Login Button */}
             <button
+              onClick={handleLogin}
               style={{
                 width: "100%",
                 background: "linear-gradient(135deg,#22c55e,#16a34a)",
@@ -389,7 +428,7 @@ export default function Login() {
                 margin: 0,
               }}
             >
-              Already have an account?{" "}
+              Don't have an account?{" "}
               <Link
                 to="/register"
                 style={{
@@ -398,7 +437,7 @@ export default function Login() {
                   textDecoration: "none",
                 }}
               >
-                Sign In
+                Sign Up
               </Link>
             </p>
           </div>
