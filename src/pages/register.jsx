@@ -1,14 +1,50 @@
 import { useState } from "react";
-import { Link } from "react-router-dom";
-import { Eye, EyeOff, Mail, Lock } from "lucide-react";
+import { Link, useNavigate } from "react-router-dom";
+import { Eye, EyeOff, Mail, Lock, CheckCircle2 } from "lucide-react"; // Ditambahkan CheckCircle2 untuk ikon popup
 
 export default function Register() {
+  const navigate = useNavigate();
+
+  // State untuk visibilitas password
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
+  // State untuk mengontrol kemunculan popup sukses
+  const [showSuccessModal, setShowSuccessModal] = useState(false);
+
+  // State untuk menampung data form input
+  const [formData, setFormData] = useState({
+    email: "",
+    password: "",
+    confirmPassword: "",
+  });
+
+  // Fungsi penanganan ketika form disubmit / tombol register ditekan
+  const handleRegister = (e) => {
+    e.preventDefault();
+
+    // Validasi sederhana: pastikan password match
+    if (formData.password !== formData.confirmPassword) {
+      alert("Password dan Confirm Password tidak cocok!");
+      return;
+    }
+
+    // Tempat untuk integrasi ke backend/API nantinya di sini
+    console.log("Data pendaftaran PROBIT:", formData);
+
+    // 1. Tampilkan popup modal sukses terlebih dahulu
+    setShowSuccessModal(true);
+  };
+
+  // Fungsi untuk menutup modal dan langsung pindah ke halaman login
+  const handleModalClose = () => {
+    setShowSuccessModal(false);
+    navigate("/login");
+  };
+
   return (
     <div
-      className="w-full min-h-screen flex items-center justify-center p-6 antialiased"
+      className="w-full min-h-screen flex items-center justify-center p-4 md:p-6 antialiased relative"
       style={{
         background:
           "linear-gradient(135deg, #edf2f7 0%, #e2e8f0 50%, #cbd5e1 100%)",
@@ -16,9 +52,44 @@ export default function Register() {
           "'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif",
       }}
     >
+      {/* ================= POPUP MODAL SUKSES (TAILWIND) ================= */}
+      {showSuccessModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm animate-fade-in">
+          <div
+            className="bg-white w-full max-w-sm rounded-2xl p-6 text-center shadow-2xl flex flex-col items-center border border-slate-100 transform scale-100 transition-all duration-300"
+            style={{
+              animation: "dropIn 0.3s ease-out forward",
+            }}
+          >
+            {/* Ikon Sukses dengan efek lingkaran hijau */}
+            <div className="w-16 h-16 bg-green-50 rounded-full flex items-center justify-center mb-4 text-green-500">
+              <CheckCircle2 className="w-10 h-10" />
+            </div>
+
+            {/* Teks Informasi */}
+            <h3 className="text-xl font-bold text-slate-900 mb-2">
+              Registrasi Berhasil!
+            </h3>
+            <p className="text-sm text-slate-600 mb-6 leading-relaxed">
+              Akun PROBIT Anda telah sukses dibuat. Silakan masuk untuk memulai
+              perjalanan kesehatan Anda.
+            </p>
+
+            {/* Tombol Konfirmasi menuju Login */}
+            <button
+              onClick={handleModalClose}
+              className="w-full bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white font-bold py-3 px-4 rounded-xl shadow-md shadow-green-500/20 transition-all duration-200 active:scale-[0.98]"
+            >
+              Ke Halaman Login
+            </button>
+          </div>
+        </div>
+      )}
+      {/* ================================================================= */}
+
       {/* WRAPPER UTAMA */}
       <div
-        className="flex overflow-hidden w-full"
+        className="flex flex-col md:flex-row overflow-hidden w-full relative z-10"
         style={{
           maxWidth: "1000px",
           minHeight: "630px",
@@ -29,9 +100,8 @@ export default function Register() {
       >
         {/* Area Form & Logo */}
         <div
-          className="flex flex-col justify-between"
+          className="flex flex-col justify-between w-full md:w-[40%]"
           style={{
-            width: "40%",
             padding: "24px 24px",
             background: "#f8fafc",
             borderRight: "1px solid rgba(148, 163, 184, 0.1)",
@@ -65,11 +135,12 @@ export default function Register() {
           </div>
 
           {/* CARD FORM */}
-          <div
+          <form
+            onSubmit={handleRegister}
             className="w-full flex flex-col justify-center"
             style={{
               background: "rgba(226, 232, 240, 0.65)",
-              borderRadius: "24px",
+              borderRadius: "20px",
               padding: "20px 20px",
               border: "1px solid rgba(148, 163, 184, 0.35)",
               backdropFilter: "blur(20px)",
@@ -109,6 +180,7 @@ export default function Register() {
             {/* Social Buttons */}
             <div className="flex" style={{ gap: "10px", marginBottom: "12px" }}>
               <button
+                type="button"
                 className="flex-1 flex items-center justify-center"
                 style={{
                   background: "rgba(255,255,255,0.75)",
@@ -124,16 +196,17 @@ export default function Register() {
               >
                 <span
                   style={{
-                    color: "#ea4335",
                     fontWeight: 900,
                     fontSize: "15px",
                   }}
+                  className="text-red-500"
                 >
                   G
                 </span>{" "}
                 Google
               </button>
               <button
+                type="button"
                 className="flex-1 flex items-center justify-center"
                 style={{
                   background: "rgba(255,255,255,0.75)",
@@ -217,7 +290,12 @@ export default function Register() {
                 />
                 <input
                   type="email"
+                  required
                   placeholder="name@example.com"
+                  value={formData.email}
+                  onChange={(e) =>
+                    setFormData({ ...formData, email: e.target.value })
+                  }
                   style={{
                     width: "100%",
                     paddingLeft: "36px",
@@ -265,7 +343,12 @@ export default function Register() {
                 />
                 <input
                   type={showPassword ? "text" : "password"}
+                  required
                   placeholder="••••••••"
+                  value={formData.password}
+                  onChange={(e) =>
+                    setFormData({ ...formData, password: e.target.value })
+                  }
                   style={{
                     width: "100%",
                     paddingLeft: "36px",
@@ -332,7 +415,15 @@ export default function Register() {
                 />
                 <input
                   type={showConfirmPassword ? "text" : "password"}
+                  required
                   placeholder="••••••••"
+                  value={formData.confirmPassword}
+                  onChange={(e) =>
+                    setFormData({
+                      ...formData,
+                      confirmPassword: e.target.value,
+                    })
+                  }
                   style={{
                     width: "100%",
                     paddingLeft: "36px",
@@ -381,6 +472,7 @@ export default function Register() {
               <input
                 type="checkbox"
                 id="terms"
+                required
                 style={{
                   marginTop: "2px",
                   width: "14px",
@@ -421,6 +513,7 @@ export default function Register() {
 
             {/* Register Button */}
             <button
+              type="submit"
               style={{
                 width: "100%",
                 background: "linear-gradient(135deg,#22c55e,#16a34a)",
@@ -470,11 +563,11 @@ export default function Register() {
                 Sign In
               </Link>
             </p>
-          </div>
+          </form>
         </div>
 
         {/* Hero Image */}
-        <div className="relative overflow-hidden" style={{ width: "60%" }}>
+        <div className="relative hidden md:block md:w-[60%] overflow-hidden">
           <img
             src="/ui_login.png"
             alt="Healthy lifestyle"

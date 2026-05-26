@@ -1,13 +1,14 @@
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom"; // <-- Ditambahkan useNavigate di sini
 import { Eye, EyeOff, Mail, Lock } from "lucide-react";
 
 export default function Login() {
   const [showPassword, setShowPassword] = useState(false);
+  const navigate = useNavigate(); // <-- Inisialisasi fungsi navigasi
 
   return (
     <div
-      className="w-full min-h-screen flex items-center justify-center p-6 antialiased"
+      className="w-full min-h-screen flex items-center justify-center p-4 sm:p-6 antialiased"
       style={{
         background:
           "linear-gradient(135deg, #edf2f7 0%, #e2e8f0 50%, #cbd5e1 100%)",
@@ -17,10 +18,9 @@ export default function Login() {
     >
       {/* WRAPPER UTAMA */}
       <div
-        className="flex overflow-hidden w-full"
+        className="flex flex-col md:flex-row overflow-hidden w-full"
         style={{
           maxWidth: "1000px",
-          height: "630px",
           borderRadius: "28px",
           boxShadow: "0 24px 80px rgba(15,23,42,0.25)",
           background: "#ffffff",
@@ -28,9 +28,8 @@ export default function Login() {
       >
         {/* Area Form & Logo */}
         <div
-          className="flex flex-col justify-between"
+          className="w-full md:w-[42%] lg:w-[38%] flex flex-col justify-between"
           style={{
-            width: "40%",
             padding: "28px 24px",
             background: "#f8fafc",
             borderRight: "1px solid rgba(148, 163, 184, 0.1)",
@@ -68,14 +67,15 @@ export default function Login() {
             className="w-full flex flex-col justify-center"
             style={{
               background: "rgba(226, 232, 240, 0.65)",
-              borderRadius: "24px",
+              borderRadius: "20px",
               padding: "24px 20px",
               border: "1px solid rgba(148, 163, 184, 0.35)",
               backdropFilter: "blur(20px)",
               WebkitBackdropFilter: "blur(20px)",
               boxShadow:
                 "inset 0 1px 2px rgba(255,255,255,0.6), 0 12px 30px rgba(15,23,42,0.08)",
-              marginTop: "16px",
+              marginTop: "24px",
+              marginBottom: "16px",
             }}
           >
             {/* Header */}
@@ -350,8 +350,10 @@ export default function Login() {
               </label>
             </div>
 
-            {/* Login Button */}
+            {/* Login Button (Sudah Ditambahkan Aksi Navigasi ke Dashboard) */}
             <button
+              type="button"
+              onClick={() => navigate("/dashboard")} // <-- Event klik ditambahkan di sini
               style={{
                 width: "100%",
                 background: "linear-gradient(135deg,#22c55e,#16a34a)",
@@ -405,12 +407,11 @@ export default function Login() {
         </div>
 
         {/* Hero Image */}
-        <div className="relative overflow-hidden" style={{ width: "60%" }}>
+        <div className="hidden md:block md:w-[58%] lg:w-[62%] relative overflow-hidden">
           <img
             src="/ui_login.png"
             alt="Healthy lifestyle"
-            className="w-full h-full"
-            style={{ objectFit: "cover", objectPosition: "center" }}
+            className="w-full h-full object-cover object-center"
           />
           <div
             style={{
