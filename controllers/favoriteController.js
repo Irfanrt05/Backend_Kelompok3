@@ -1,18 +1,19 @@
 import { Favorite, Recipe } from "../models/index.js";
-import { logActivity } from "../utils/activityLog.js";
+import { logActivity } from "../utils/ActivityLog.js";
 
 export const addFavorite = async (req, res) => {
   try {
     const { recipe_id } = req.body;
 
-    if (!recipe_id) return res.status(400).json({ message: "recipe_id is required" });
+    if (!recipe_id)
+      return res.status(400).json({ message: "recipe_id is required" });
 
     const recipe = await Recipe.findByPk(recipe_id);
     if (!recipe) return res.status(404).json({ message: "Recipe not found" });
 
     const [favorite] = await Favorite.findOrCreate({
       where: { user_id: req.user.id, recipe_id },
-      defaults: { user_id: req.user.id, recipe_id }
+      defaults: { user_id: req.user.id, recipe_id },
     });
 
     await logActivity(req.user.id, "ADD_FAVORITE_RECIPE");
@@ -27,7 +28,7 @@ export const getFavorites = async (req, res) => {
     const favorites = await Favorite.findAll({
       where: { user_id: req.user.id },
       include: [Recipe],
-      order: [["id", "DESC"]]
+      order: [["id", "DESC"]],
     });
 
     return res.json({ status: "success", data: favorites });
@@ -38,8 +39,11 @@ export const getFavorites = async (req, res) => {
 
 export const deleteFavorite = async (req, res) => {
   try {
-    const favorite = await Favorite.findOne({ where: { id: req.params.id, user_id: req.user.id } });
-    if (!favorite) return res.status(404).json({ message: "Favorite not found" });
+    const favorite = await Favorite.findOne({
+      where: { id: req.params.id, user_id: req.user.id },
+    });
+    if (!favorite)
+      return res.status(404).json({ message: "Favorite not found" });
 
     await favorite.destroy();
     await logActivity(req.user.id, "DELETE_FAVORITE_RECIPE");

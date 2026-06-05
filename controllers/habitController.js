@@ -1,5 +1,5 @@
 import { Habit, HabitTask } from "../models/index.js";
-import { logActivity } from "../utils/activityLog.js";
+import { logActivity } from "../utils/ActivityLog.js";
 
 export const createHabit = async (req, res) => {
   try {
@@ -13,7 +13,7 @@ export const createHabit = async (req, res) => {
       user_id: req.user.id,
       activity_name,
       target,
-      plan_detail_id
+      plan_detail_id,
     });
 
     await logActivity(req.user.id, "CREATE_HABIT");
@@ -28,7 +28,7 @@ export const getHabits = async (req, res) => {
     const habits = await Habit.findAll({
       where: { user_id: req.user.id },
       include: [HabitTask],
-      order: [["id", "DESC"]]
+      order: [["id", "DESC"]],
     });
 
     return res.json({ status: "success", data: habits });
@@ -41,7 +41,7 @@ export const getHabitById = async (req, res) => {
   try {
     const habit = await Habit.findOne({
       where: { id: req.params.id, user_id: req.user.id },
-      include: [HabitTask]
+      include: [HabitTask],
     });
 
     if (!habit) return res.status(404).json({ message: "Habit not found" });
@@ -53,13 +53,19 @@ export const getHabitById = async (req, res) => {
 
 export const updateHabit = async (req, res) => {
   try {
-    const habit = await Habit.findOne({ where: { id: req.params.id, user_id: req.user.id } });
+    const habit = await Habit.findOne({
+      where: { id: req.params.id, user_id: req.user.id },
+    });
     if (!habit) return res.status(404).json({ message: "Habit not found" });
 
     await habit.update(req.body);
     await logActivity(req.user.id, "UPDATE_HABIT");
 
-    return res.json({ status: "success", message: "Habit updated", data: habit });
+    return res.json({
+      status: "success",
+      message: "Habit updated",
+      data: habit,
+    });
   } catch (error) {
     return res.status(500).json({ message: error.message });
   }
@@ -67,7 +73,9 @@ export const updateHabit = async (req, res) => {
 
 export const deleteHabit = async (req, res) => {
   try {
-    const habit = await Habit.findOne({ where: { id: req.params.id, user_id: req.user.id } });
+    const habit = await Habit.findOne({
+      where: { id: req.params.id, user_id: req.user.id },
+    });
     if (!habit) return res.status(404).json({ message: "Habit not found" });
 
     await habit.destroy();
@@ -81,7 +89,9 @@ export const deleteHabit = async (req, res) => {
 
 export const checkHabit = async (req, res) => {
   try {
-    const habit = await Habit.findOne({ where: { id: req.params.id, user_id: req.user.id } });
+    const habit = await Habit.findOne({
+      where: { id: req.params.id, user_id: req.user.id },
+    });
     if (!habit) return res.status(404).json({ message: "Habit not found" });
 
     const date = req.body.date || new Date().toISOString().slice(0, 10);
@@ -89,7 +99,7 @@ export const checkHabit = async (req, res) => {
 
     const [task, created] = await HabitTask.findOrCreate({
       where: { habit_id: habit.id, date },
-      defaults: { habit_id: habit.id, date, is_completed }
+      defaults: { habit_id: habit.id, date, is_completed },
     });
 
     if (!created) await task.update({ is_completed });

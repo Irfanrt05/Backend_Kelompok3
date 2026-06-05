@@ -6,13 +6,13 @@ import {
   getProfiles,
   getProfileById,
   updateProfile,
-  deleteProfile
+  deleteProfile,
 } from "../controllers/profileController.js";
 import {
   generatePlan,
   getPlans,
   getPlanById,
-  deletePlan
+  deletePlan,
 } from "../controllers/planController.js";
 import {
   createHabit,
@@ -20,42 +20,44 @@ import {
   getHabitById,
   updateHabit,
   deleteHabit,
-  checkHabit
+  checkHabit,
 } from "../controllers/habitController.js";
 import {
   createReminder,
   getReminders,
   updateReminder,
-  deleteReminder
+  deleteReminder,
 } from "../controllers/reminderController.js";
 import {
   createRecipe,
   getRecipes,
   getRecipeById,
   updateRecipe,
-  deleteRecipe
+  deleteRecipe,
 } from "../controllers/recipeController.js";
 import {
   createBlog,
   getBlogs,
   getBlogById,
   updateBlog,
-  deleteBlog
+  deleteBlog,
 } from "../controllers/blogController.js";
 import {
   addFavorite,
   getFavorites,
-  deleteFavorite
+  deleteFavorite,
 } from "../controllers/favoriteController.js";
 import {
   getUsers,
   updateUserRole,
   deleteUser,
-  getActivityLogs
+  getActivityLogs,
+  updateAdminProfile,
 } from "../controllers/adminUserController.js";
 
 import { verifyToken } from "../middleware/auth.js";
 import { allowRoles } from "../middleware/role.js";
+import { upload } from "../middleware/upload.js";
 
 const router = express.Router();
 
@@ -71,49 +73,202 @@ router.get("/blogs", getBlogs);
 router.get("/blogs/:id", getBlogById);
 
 // User health profile
-router.post("/user/health-profiles", verifyToken, allowRoles("user", "admin"), createProfile);
-router.get("/user/health-profiles", verifyToken, allowRoles("user", "admin"), getProfiles);
-router.get("/user/health-profiles/:id", verifyToken, allowRoles("user", "admin"), getProfileById);
-router.put("/user/health-profiles/:id", verifyToken, allowRoles("user", "admin"), updateProfile);
-router.delete("/user/health-profiles/:id", verifyToken, allowRoles("user", "admin"), deleteProfile);
+router.post(
+  "/user/health-profiles",
+  verifyToken,
+  allowRoles("user", "admin"),
+  createProfile,
+);
+router.get(
+  "/user/health-profiles",
+  verifyToken,
+  allowRoles("user", "admin"),
+  getProfiles,
+);
+router.get(
+  "/user/health-profiles/:id",
+  verifyToken,
+  allowRoles("user", "admin"),
+  getProfileById,
+);
+router.put(
+  "/user/health-profiles/:id",
+  verifyToken,
+  allowRoles("user", "admin"),
+  updateProfile,
+);
+router.delete(
+  "/user/health-profiles/:id",
+  verifyToken,
+  allowRoles("user", "admin"),
+  deleteProfile,
+);
 
 // Generated plan from health profile
-router.post("/user/generated-plans", verifyToken, allowRoles("user", "admin"), generatePlan);
-router.get("/user/generated-plans", verifyToken, allowRoles("user", "admin"), getPlans);
-router.get("/user/generated-plans/:id", verifyToken, allowRoles("user", "admin"), getPlanById);
-router.delete("/user/generated-plans/:id", verifyToken, allowRoles("user", "admin"), deletePlan);
+router.post(
+  "/user/generated-plans",
+  verifyToken,
+  allowRoles("user", "admin"),
+  generatePlan,
+);
+router.get(
+  "/user/generated-plans",
+  verifyToken,
+  allowRoles("user", "admin"),
+  getPlans,
+);
+router.get(
+  "/user/generated-plans/:id",
+  verifyToken,
+  allowRoles("user", "admin"),
+  getPlanById,
+);
+router.delete(
+  "/user/generated-plans/:id",
+  verifyToken,
+  allowRoles("user", "admin"),
+  deletePlan,
+);
 
 // Habits
-router.post("/user/habits", verifyToken, allowRoles("user", "admin"), createHabit);
+router.post(
+  "/user/habits",
+  verifyToken,
+  allowRoles("user", "admin"),
+  createHabit,
+);
 router.get("/user/habits", verifyToken, allowRoles("user", "admin"), getHabits);
-router.get("/user/habits/:id", verifyToken, allowRoles("user", "admin"), getHabitById);
-router.put("/user/habits/:id", verifyToken, allowRoles("user", "admin"), updateHabit);
-router.delete("/user/habits/:id", verifyToken, allowRoles("user", "admin"), deleteHabit);
-router.post("/user/habits/:id/check", verifyToken, allowRoles("user", "admin"), checkHabit);
+router.get(
+  "/user/habits/:id",
+  verifyToken,
+  allowRoles("user", "admin"),
+  getHabitById,
+);
+router.put(
+  "/user/habits/:id",
+  verifyToken,
+  allowRoles("user", "admin"),
+  updateHabit,
+);
+router.delete(
+  "/user/habits/:id",
+  verifyToken,
+  allowRoles("user", "admin"),
+  deleteHabit,
+);
+router.post(
+  "/user/habits/:id/check",
+  verifyToken,
+  allowRoles("user", "admin"),
+  checkHabit,
+);
 
 // Reminders
-router.post("/user/reminders", verifyToken, allowRoles("user", "admin"), createReminder);
-router.get("/user/reminders", verifyToken, allowRoles("user", "admin"), getReminders);
-router.put("/user/reminders/:id", verifyToken, allowRoles("user", "admin"), updateReminder);
-router.delete("/user/reminders/:id", verifyToken, allowRoles("user", "admin"), deleteReminder);
+router.post(
+  "/user/reminders",
+  verifyToken,
+  allowRoles("user", "admin"),
+  createReminder,
+);
+router.get(
+  "/user/reminders",
+  verifyToken,
+  allowRoles("user", "admin"),
+  getReminders,
+);
+router.put(
+  "/user/reminders/:id",
+  verifyToken,
+  allowRoles("user", "admin"),
+  updateReminder,
+);
+router.delete(
+  "/user/reminders/:id",
+  verifyToken,
+  allowRoles("user", "admin"),
+  deleteReminder,
+);
 
 // Favorites
-router.post("/user/favorites", verifyToken, allowRoles("user", "admin"), addFavorite);
-router.get("/user/favorites", verifyToken, allowRoles("user", "admin"), getFavorites);
-router.delete("/user/favorites/:id", verifyToken, allowRoles("user", "admin"), deleteFavorite);
+router.post(
+  "/user/favorites",
+  verifyToken,
+  allowRoles("user", "admin"),
+  addFavorite,
+);
+router.get(
+  "/user/favorites",
+  verifyToken,
+  allowRoles("user", "admin"),
+  getFavorites,
+);
+router.delete(
+  "/user/favorites/:id",
+  verifyToken,
+  allowRoles("user", "admin"),
+  deleteFavorite,
+);
 
-// Admin only
+// Admin only\
 router.get("/admin/users", verifyToken, allowRoles("admin"), getUsers);
-router.put("/admin/users/:id/role", verifyToken, allowRoles("admin"), updateUserRole);
+router.put(
+  "/admin/users/:id/role",
+  verifyToken,
+  allowRoles("admin"),
+  updateUserRole,
+);
 router.delete("/admin/users/:id", verifyToken, allowRoles("admin"), deleteUser);
-router.get("/admin/activity-logs", verifyToken, allowRoles("admin"), getActivityLogs);
+router.get(
+  "/admin/activity-logs",
+  verifyToken,
+  allowRoles("admin"),
+  getActivityLogs,
+);
 
-router.post("/admin/recipes", verifyToken, allowRoles("admin"), createRecipe);
-router.put("/admin/recipes/:id", verifyToken, allowRoles("admin"), updateRecipe);
-router.delete("/admin/recipes/:id", verifyToken, allowRoles("admin"), deleteRecipe);
+router.put(
+  "/admin/profile",
+  verifyToken,
+  allowRoles("admin"),
+  upload.single("image"),
+  updateAdminProfile,
+);
 
-router.post("/admin/blogs", verifyToken, allowRoles("admin"), createBlog);
-router.put("/admin/blogs/:id", verifyToken, allowRoles("admin"), updateBlog);
+router.post(
+  "/admin/recipes",
+  verifyToken,
+  allowRoles("admin"),
+  upload.single("image"),
+  createRecipe,
+);
+router.put(
+  "/admin/recipes/:id",
+  verifyToken,
+  allowRoles("admin"),
+  upload.single("image"),
+  updateRecipe,
+);
+router.delete(
+  "/admin/recipes/:id",
+  verifyToken,
+  allowRoles("admin"),
+  deleteRecipe,
+);
+
+router.post(
+  "/admin/blogs",
+  verifyToken,
+  allowRoles("admin"),
+  upload.single("image"),
+  createBlog,
+);
+router.get("/admin/blogs", verifyToken, allowRoles("admin"), getBlogs);
+router.put(
+  "/admin/blogs/:id",
+  verifyToken,
+  allowRoles("admin"),
+  upload.single("image"),
+  updateBlog,
+);
 router.delete("/admin/blogs/:id", verifyToken, allowRoles("admin"), deleteBlog);
 
 export default router;
