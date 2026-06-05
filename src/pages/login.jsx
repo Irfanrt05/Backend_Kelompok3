@@ -6,36 +6,39 @@ import api from "../services/api";
 
 export default function Login() {
   const [showPassword, setShowPassword] = useState(false);
-const navigate = useNavigate();
+  const navigate = useNavigate();
 
-const [form, setForm] = useState({
-  email: "",
-  password: "",
-});
-
-const handleChange = (e) => {
-  setForm({
-    ...form,
-    [e.target.name]: e.target.value,
+  const [form, setForm] = useState({
+    email: "",
+    password: "",
   });
-};
 
-const handleLogin = async () => {
-  try {
-    const res = await api.post("/auth/login", form);
+  const handleChange = (e) => {
+    setForm({
+      ...form,
+      [e.target.name]: e.target.value,
+    });
+  };
 
-    localStorage.setItem("token", res.data.token);
-    localStorage.setItem("user", JSON.stringify(res.data.user));
+  const handleLogin = async () => {
+    try {
+      const res = await api.post("/auth/login", form);
 
-    if (res.data.user.role === "admin") {
-      navigate("/admin");
-    } else {
-      navigate("/");
+      console.log("LOGIN RESPONSE:", res.data);
+
+      localStorage.setItem("token", res.data.token);
+      localStorage.setItem("user", JSON.stringify(res.data.user));
+
+      if (res.data.user.role === "admin") {
+        navigate("/admin");
+      } else {
+        navigate("/dashboard");
+      }
+    } catch (error) {
+      console.error(error);
+      alert(error.response?.data?.message || "Login gagal");
     }
-  } catch (error) {
-    alert(error.response?.data?.message || "Login gagal");
-  }
-};
+  };
 
   return (
     <div
