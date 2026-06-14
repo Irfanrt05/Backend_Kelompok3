@@ -10,3 +10,5 @@ export const createRecipe = (data) => api.post("/admin/recipes", data);
 // 3. Hapus data: Request ke DELETE http://localhost:5000/api/admin/recipes/:id
 export const deleteRecipe = (id) => api.delete(`/admin/recipes/${id}`);
 export const updateRecipe = (id, data) => api.put(`/admin/recipes/${id}`, data);
+
+export const getRecipeById = (id) => api.get(`/recipes/${id}`);

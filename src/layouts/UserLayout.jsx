@@ -4,13 +4,11 @@ import UserHeader from "../components/user/UserHeader";
 
 export default function UserLayout() {
   return (
-    <div className="flex min-h-screen bg-slate-50">
+    <div className="min-h-screen bg-[#f4f4f4]">
       <UserSidebar />
-
-      <div className="flex-1">
+      <div className="ml-[125px] min-h-screen">
         <UserHeader />
-
-        <main className="p-8">
+        <main className="px-9 pb-10">
           <Outlet />
         </main>
       </div>

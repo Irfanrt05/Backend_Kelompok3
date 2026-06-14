@@ -4,6 +4,7 @@ import {
   Newspaper,
   FileBarChart,
   Utensils,
+  Activity,
   LogOut,
 } from "lucide-react";
 import { NavLink, useNavigate } from "react-router-dom";
@@ -23,6 +24,7 @@ export default function Sidebar() {
     { name: "Pengguna", icon: Users, path: "/admin/users" },
     { name: "Blog", icon: Newspaper, path: "/admin/blogs" },
     { name: "Laporan", icon: FileBarChart, path: "/admin/reports" },
+    { name: "Activity Log", icon: Activity, path: "/admin/activity-logs" },
     { name: "Resep", icon: Utensils, path: "/admin/recipes" },
   ];
 
