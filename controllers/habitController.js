@@ -1,5 +1,5 @@
 import { Habit, HabitTask } from "../models/index.js";
-import { logActivity } from "../utils/ActivityLog.js";
+import { logActivity } from "../utils/activityLog.js";
 
 export const createHabit = async (req, res) => {
   try {

@@ -1,5 +1,5 @@
 import { Blog, User } from "../models/index.js";
-import { logActivity } from "../utils/ActivityLog.js";
+import { logActivity } from "../utils/activityLog.js";
 import fs from "fs";
 import path from "path";
 

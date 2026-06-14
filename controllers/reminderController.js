@@ -1,5 +1,5 @@
 import { Reminder, Habit } from "../models/index.js";
-import { logActivity } from "../utils/ActivityLog.js";
+import { logActivity } from "../utils/activityLog.js";
 
 export const createReminder = async (req, res) => {
   try {

@@ -1,5 +1,5 @@
-import { Favorite, Recipe } from "../models/index.js";
-import { logActivity } from "../utils/ActivityLog.js";
+import { Favorite, Recipe, Blog } from "../models/index.js";
+import { logActivity } from "../utils/activityLog.js";
 
 export const addFavorite = async (req, res) => {
   try {
@@ -23,11 +23,37 @@ export const addFavorite = async (req, res) => {
   }
 };
 
+export const addFavoriteBlog = async (req, res) => {
+  try {
+    const { blog_id } = req.body;
+
+    if (!blog_id) {
+      return res.status(400).json({ message: "blog_id is required" });
+    }
+
+    const blog = await Blog.findByPk(blog_id);
+    if (!blog) {
+      return res.status(404).json({ message: "Blog not found" });
+    }
+
+    const [favorite] = await Favorite.findOrCreate({
+      where: { user_id: req.user.id, blog_id },
+      defaults: { user_id: req.user.id, blog_id },
+    });
+
+    await logActivity(req.user.id, "ADD_FAVORITE_BLOG");
+
+    return res.status(201).json({ status: "success", data: favorite });
+  } catch (error) {
+    return res.status(500).json({ message: error.message });
+  }
+};
+
 export const getFavorites = async (req, res) => {
   try {
     const favorites = await Favorite.findAll({
       where: { user_id: req.user.id },
-      include: [Recipe],
+      include: [Recipe, Blog],
       order: [["id", "DESC"]],
     });
 
@@ -36,6 +62,23 @@ export const getFavorites = async (req, res) => {
     return res.status(500).json({ message: error.message });
   }
 };
+
+export const deleteFavoriteBlog = async (req, res) => {
+  try {
+    const favorite = await Favorite.findOne({
+      where: { id: req.params.id, user_id: req.user.id },
+    });
+    if (!favorite)
+      return res.status(404).json({ message: "Favorite not found" });
+
+    await favorite.destroy();
+    await logActivity(req.user.id, "DELETE_FAVORITE_BLOG");
+
+    return res.json({ status: "success", message: "Favorite deleted" });
+  } catch (error) {
+    return res.status(500).json({ message: error.message });
+  }
+}
 
 export const deleteFavorite = async (req, res) => {
   try {

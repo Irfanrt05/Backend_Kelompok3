@@ -5,7 +5,7 @@ import {
   PlanDetail,
 } from "../models/index.js";
 import { buildPlanFromProfile } from "../services/generatePlanService.js";
-import { logActivity } from "../utils/ActivityLog.js";
+import { logActivity } from "../utils/activityLog.js";
 
 export const generatePlan = async (req, res) => {
   const transaction = await sequelize.transaction();

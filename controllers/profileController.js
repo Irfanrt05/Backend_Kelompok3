@@ -1,5 +1,5 @@
 import { UserHealthProfile } from "../models/index.js";
-import { logActivity } from "../utils/ActivityLog.js";
+import { logActivity } from "../utils/activityLog.js";
 
 export const createProfile = async (req, res) => {
   try {
@@ -13,10 +13,31 @@ export const createProfile = async (req, res) => {
       budget_limit,
     } = req.body;
 
-    if (!weight || !height || !goal_type) {
+    const numericAge = Number(age);
+    const numericWeight = Number(weight);
+    const numericHeight = Number(height);
+    const numericBudget = budget_limit === undefined || budget_limit === null || budget_limit === "" ? null : Number(budget_limit);
+
+    if (!age || !weight || !height || !goal_type) {
       return res
         .status(400)
-        .json({ message: "weight, height, and goal_type are required" });
+        .json({ message: "age, weight, height, and goal_type are required" });
+    }
+
+    if (!Number.isFinite(numericAge) || numericAge < 13 || numericAge > 100) {
+      return res.status(400).json({ message: "Umur harus antara 13 sampai 100 tahun" });
+    }
+
+    if (!Number.isFinite(numericWeight) || numericWeight < 20 || numericWeight > 300) {
+      return res.status(400).json({ message: "Berat badan harus antara 20 sampai 300 kg" });
+    }
+
+    if (!Number.isFinite(numericHeight) || numericHeight < 80 || numericHeight > 250) {
+      return res.status(400).json({ message: "Tinggi badan harus antara 80 sampai 250 cm" });
+    }
+
+    if (numericBudget !== null && (!Number.isFinite(numericBudget) || numericBudget < 0 || numericBudget > 100000000)) {
+      return res.status(400).json({ message: "Budget harus antara 0 sampai 100000000" });
     }
 
     const profile = await UserHealthProfile.create({

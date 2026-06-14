@@ -42,7 +42,11 @@ Blog.belongsTo(User, { foreignKey: "admin_id" });
 User.belongsToMany(Recipe, { through: Favorite, foreignKey: "user_id" });
 Recipe.belongsToMany(User, { through: Favorite, foreignKey: "recipe_id" });
 Favorite.belongsTo(Recipe, { foreignKey: "recipe_id" });
+User.belongsToMany(Blog, { through: Favorite, foreignKey: "user_id" });
+Blog.belongsToMany(User, { through: Favorite, foreignKey: "blog_id" });
+Favorite.belongsTo(Blog, { foreignKey: "blog_id" });
 Favorite.belongsTo(User, { foreignKey: "user_id" });
+
 
 User.hasMany(Reminder, { foreignKey: "user_id", onDelete: "CASCADE" });
 Reminder.belongsTo(User, { foreignKey: "user_id" });

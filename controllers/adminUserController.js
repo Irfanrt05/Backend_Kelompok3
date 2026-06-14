@@ -1,5 +1,5 @@
 import { User, ActivityLog } from "../models/index.js";
-import { logActivity } from "../utils/ActivityLog.js";
+import { logActivity } from "../utils/activityLog.js";
 
 const userAttributes = [
   "id",
@@ -73,6 +73,26 @@ export const getActivityLogs = async (req, res) => {
       ],
       order: [["id", "DESC"]],
     });
+    return res.json({ status: "success", data: logs });
+  } catch (error) {
+    return res.status(500).json({ message: error.message });
+  }
+};
+
+
+export const getMyActivityLogs = async (req, res) => {
+  try {
+    const logs = await ActivityLog.findAll({
+      where: { user_id: req.user.id },
+      include: [
+        {
+          model: User,
+          attributes: ["id", "username", "email", "role", "avatar"],
+        },
+      ],
+      order: [["id", "DESC"]],
+    });
+
     return res.json({ status: "success", data: logs });
   } catch (error) {
     return res.status(500).json({ message: error.message });

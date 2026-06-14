@@ -44,20 +44,24 @@ import {
 } from "../controllers/blogController.js";
 import {
   addFavorite,
+  addFavoriteBlog,
   getFavorites,
   deleteFavorite,
+  deleteFavoriteBlog,
 } from "../controllers/favoriteController.js";
 import {
   getUsers,
   updateUserRole,
   deleteUser,
   getActivityLogs,
+  getMyActivityLogs,
   updateAdminProfile,
 } from "../controllers/adminUserController.js";
 
 import { verifyToken } from "../middleware/auth.js";
 import { allowRoles } from "../middleware/role.js";
 import { upload } from "../middleware/upload.js";
+import { logBlogVisit, logRecipeVisit } from "../controllers/visitController.js";
 
 const router = express.Router();
 
@@ -207,6 +211,45 @@ router.delete(
   verifyToken,
   allowRoles("user", "admin"),
   deleteFavorite,
+);
+
+router.post(
+  "/user/favorites/blogs",
+  verifyToken,
+  allowRoles("user", "admin"),
+  addFavoriteBlog,
+);
+
+router.delete(
+  "/user/favorites/blogs/:id",
+  verifyToken,
+  allowRoles("user", "admin"),
+  deleteFavoriteBlog,
+);
+
+// Admin content management
+
+
+
+router.post(
+  "/user/articles/:id/visit",
+  verifyToken,
+  allowRoles("user", "admin"),
+  logBlogVisit,
+);
+
+router.post(
+  "/user/recipes/:id/visit",
+  verifyToken,
+  allowRoles("user", "admin"),
+  logRecipeVisit,
+);
+
+router.get(
+  "/user/activity-logs",
+  verifyToken,
+  allowRoles("user", "admin"),
+  getMyActivityLogs,
 );
 
 // Admin only\
