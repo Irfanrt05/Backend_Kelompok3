@@ -4,7 +4,7 @@ import { Link } from "react-router-dom";
 import { getDisplayName, getStoredUser, getUserAvatar } from "../utils/userStorage";
 import { getHealthProfiles, getGeneratedPlans } from "../services/userHealthService";
 import { getMyActivityLogs } from "../services/activityLogService";
-import { getFavoriteRecipes } from "../services/favoriteService";
+import { getFavorites } from "../services/favoriteService";
 import { formatTimeIndonesia } from "../utils/dateTime";
 
 const getPlanDetails = (plan) => plan?.plan_details || plan?.PlanDetails || plan?.planDetails || [];
@@ -31,7 +31,7 @@ export default function Dashboard() {
           getHealthProfiles().catch(() => ({ data: { data: [] } })),
           getGeneratedPlans().catch(() => ({ data: { data: [] } })),
           getMyActivityLogs().catch(() => ({ data: { data: [] } })),
-          getFavoriteRecipes().catch(() => ({ data: { data: [] } })),
+          getFavorites().catch(() => ({ data: { data: [] } })),
         ]);
         setProfiles(profileRes.data.data || []);
         setPlans(planRes.data.data || []);

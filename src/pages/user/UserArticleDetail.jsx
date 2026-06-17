@@ -1,9 +1,10 @@
 import { useEffect, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
-import { ArrowLeft, Loader2 } from "lucide-react";
+import { ArrowLeft, Loader2, Heart } from "lucide-react";
 import { getPublicBlogById, resolveImageUrl } from "../../services/contentService";
 import { logArticleVisit } from "../../services/visitService";
 import { formatDateIndonesia } from "../../utils/dateTime";
+import { addFavoriteBlog } from "../../services/favoriteService";
 
 export default function UserArticleDetail() {
   const { id } = useParams();
@@ -29,6 +30,15 @@ export default function UserArticleDetail() {
     fetchDetail();
     window.scrollTo(0, 0);
   }, [id]);
+
+  const handleFavorite = async () => {
+    try {
+      await addFavoriteBlog(article.id);
+      alert("Artikel berhasil ditambahkan ke favorite.");
+    } catch (err) {
+      alert(err.response?.data?.message || "Gagal menambahkan favorite.");
+    }
+  }; 
 
   if (loading) {
     return (
@@ -58,10 +68,20 @@ export default function UserArticleDetail() {
         <ArrowLeft size={18} /> Kembali
       </button>
 
+      
       <article className="bg-white rounded-[28px] p-8 md:p-10 shadow-sm border border-slate-100">
+        <div className="mb-5 flex items-center justify-between gap-4">
         <p className="text-sm font-bold text-[#10BB89] mb-3 uppercase">
           {article.category || "Artikel"}
         </p>
+          <button
+            onClick={handleFavorite}
+            className="inline-flex items-center gap-2 rounded-2xl bg-[#10BB89] px-5 py-3 text-sm font-black text-white hover:bg-[#0E9F75] topri"
+          >
+            <Heart size={18} /> Tambahkan ke Favorite
+          </button>
+        </div>
+
         <h1 className="text-[30px] md:text-[40px] leading-tight font-black text-black mb-4 max-w-[900px]">
           {article.title}
         </h1>

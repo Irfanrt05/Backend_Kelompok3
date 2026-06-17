@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { Link, useSearchParams } from "react-router-dom";
 import { AlertCircle, ChefHat, Heart, Loader2, Trash2 } from "lucide-react";
-import { getFavoriteRecipes, deleteFavoriteRecipe } from "../../services/favoriteService";
+import { getFavorites, deleteFavorite, deleteFavoriteBlog } from "../../services/favoriteService";
 import { resolveImageUrl } from "../../services/contentService";
 import { stripText } from "../../utils/text";
 
@@ -16,7 +16,7 @@ export default function UserFavorites() {
     setLoading(true);
     setError("");
     try {
-      const res = await getFavoriteRecipes();
+      const res = await getFavorites();
       setFavorites(res.data.data || []);
     } catch (err) {
       console.error("Gagal mengambil favorite:", err);
@@ -33,20 +33,42 @@ export default function UserFavorites() {
 
   const filteredFavorites = useMemo(() => {
     const q = keyword.trim().toLowerCase();
-    if (!q) return favorites;
-    return favorites.filter((favorite) => {
+
+    const data = favorites.map((favorite) => {
       const recipe = favorite.Recipe || favorite.recipe || {};
-      return `${recipe.title || ""} ${recipe.category || ""} ${recipe.details || ""}`.toLowerCase().includes(q);
+      const blog = favorite.Blog || favorite.blog || {};
+
+      return {
+        ...favorite,
+        recipe,
+        blog,
+      };
+    });
+
+    if (!q) return data;
+
+    return data.filter((favorite) => {
+      const recipeText = `${favorite.recipe.title || ""} ${favorite.recipe.category || ""} ${favorite.recipe.details || ""}`;
+      const blogText = `${favorite.blog.title || ""} ${favorite.blog.category || ""} ${favorite.blog.content || ""}`;
+
+      return `${recipeText} ${blogText}`.toLowerCase().includes(q);
     });
   }, [favorites, keyword]);
 
-  const handleDelete = async (favoriteId) => {
-    if (!window.confirm("Hapus resep ini dari favorite?")) return;
+  const favoriteRecipes = filteredFavorites.filter((favorite) => favorite.recipe_id);
+  const favoriteBlogs = filteredFavorites.filter((favorite) => favorite.blog_id);
+
+  const handleDeleteFavorite = async (favorite) => {
     try {
-      await deleteFavoriteRecipe(favoriteId);
+      if (favorite.blog_id) {
+        await deleteFavoriteBlog(favorite.id);
+      } else {
+        await deleteFavorite(favorite.id);
+      }
+
       fetchFavorites();
-    } catch (err) {
-      alert(err.response?.data?.message || "Gagal menghapus favorite");
+    } catch (error) {
+      alert(error.response?.data?.message || "Gagal menghapus favorite");
     }
   };
 
@@ -67,11 +89,6 @@ export default function UserFavorites() {
         </div>
       </div>
 
-      <div className="flex items-center justify-between gap-5 mb-9">
-        <h2 className="text-[28px] font-black text-black">Resep Favorite</h2>
-        {keyword && <p className="text-sm text-slate-500">Hasil pencarian: <b>{keyword}</b></p>}
-      </div>
-
       {loading ? (
         <div className="h-[280px] flex items-center justify-center text-slate-500 gap-3">
           <Loader2 className="animate-spin" /> Memuat favorite...
@@ -82,44 +99,115 @@ export default function UserFavorites() {
         </div>
       ) : filteredFavorites.length === 0 ? (
         <div className="bg-white rounded-2xl p-10 text-center text-slate-500">
-          Belum ada resep favorite.
+          Belum ada favorite.
         </div>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-7">
-          {filteredFavorites.map((favorite) => {
-            const recipe = favorite.Recipe || favorite.recipe || {};
-            return (
-              <div key={favorite.id} className="bg-white rounded-2xl overflow-hidden shadow-sm border border-slate-100 min-h-[305px] flex flex-col relative group">
-                <Link to={`/dashboard/recipes/${recipe.id}`} className="block">
-                  <img
-                    src={resolveImageUrl(recipe.image_url, "https://images.unsplash.com/photo-1490645935967-10de6ba17061?auto=format&fit=crop&w=900&q=80")}
-                    alt={recipe.title}
-                    className="h-[170px] w-full object-cover bg-slate-200"
-                  />
-                </Link>
-                <button
-                  onClick={() => handleDelete(favorite.id)}
-                  className="absolute top-4 right-4 w-10 h-10 rounded-2xl bg-white/90 text-red-500 flex items-center justify-center shadow hover:bg-red-50"
-                  title="Hapus favorite"
-                >
-                  <Trash2 size={18} />
-                </button>
-                <div className="p-6 flex-1 flex flex-col">
-                  <span className="text-[11px] font-bold uppercase text-[#10BB89] flex items-center gap-1 mb-3">
-                    <ChefHat size={14} /> {recipe.category || "Resep sehat"}
-                  </span>
-                  <Link to={`/dashboard/recipes/${recipe.id}`}>
-                    <h3 className="text-[18px] leading-snug font-black text-black mb-4 line-clamp-2 hover:text-[#10BB89]">
-                      {recipe.title}
-                    </h3>
-                  </Link>
-                  <p className="text-[12px] leading-relaxed text-black/80 line-clamp-4">
-                    {stripText(recipe.details)}
-                  </p>
-                </div>
+        <div className="space-y-12">
+          <div>
+            <div className="flex items-center justify-between gap-5 mb-7">
+              <h2 className="text-[28px] font-black text-black">Artikel Favorite</h2>
+            </div>
+
+            {favoriteBlogs.length === 0 ? (
+              <div className="bg-white rounded-2xl p-8 text-center text-slate-500">
+                Belum ada artikel favorite.
               </div>
-            );
-          })}
+            ) : (
+              <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-7">
+                {favoriteBlogs.map((favorite) => {
+                  const blog = favorite.Blog || favorite.blog || favorite.blog || {};
+                  return (
+                    <div key={favorite.id} className="bg-white rounded-2xl overflow-hidden shadow-sm border border-slate-100 min-h-[305px] flex flex-col relative group">
+                      <Link to={`/dashboard/articles/${blog.id}`} className="block">
+                        <img
+                          src={resolveImageUrl(blog.image_url, "https://images.unsplash.com/photo-1499750310107-5fef28a66643?auto=format&fit=crop&w=900&q=80")}
+                          alt={blog.title}
+                          className="h-[170px] w-full object-cover bg-slate-200"
+                        />
+                      </Link>
+
+                      <button
+                        onClick={() => handleDeleteFavorite(favorite)}
+                        className="absolute top-4 right-4 w-10 h-10 rounded-2xl bg-white/90 text-red-500 flex items-center justify-center shadow hover:bg-red-50"
+                        title="Hapus favorite"
+                      >
+                        <Trash2 size={18} />
+                      </button>
+
+                      <div className="p-6 flex-1 flex flex-col">
+                        <span className="text-[11px] font-bold uppercase text-[#10BB89] flex items-center gap-1 mb-3">
+                          <Heart size={14} /> {blog.category || "Artikel sehat"}
+                        </span>
+
+                        <Link to={`/dashboard/articles/${blog.id}`}>
+                          <h3 className="text-[18px] leading-snug font-black text-black mb-4 line-clamp-2 hover:text-[#10BB89]">
+                            {blog.title}
+                          </h3>
+                        </Link>
+
+                        <p className="text-[12px] leading-relaxed text-black/80 line-clamp-4">
+                          {stripText(blog.content)}
+                        </p>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+          </div>
+
+          <div>
+            <div className="flex items-center justify-between gap-5 mb-7">
+              <h2 className="text-[28px] font-black text-black">Resep Favorite</h2>
+            </div>
+
+            {favoriteRecipes.length === 0 ? (
+              <div className="bg-white rounded-2xl p-8 text-center text-slate-500">
+                Belum ada resep favorite.
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-7">
+                {favoriteRecipes.map((favorite) => {
+                  const recipe = favorite.Recipe || favorite.recipe || {};
+                  return (
+                    <div key={favorite.id} className="bg-white rounded-2xl overflow-hidden shadow-sm border border-slate-100 min-h-[305px] flex flex-col relative group">
+                      <Link to={`/dashboard/recipes/${recipe.id}`} className="block">
+                        <img
+                          src={resolveImageUrl(recipe.image_url, "https://images.unsplash.com/photo-1490645935967-10de6ba17061?auto=format&fit=crop&w=900&q=80")}
+                          alt={recipe.title}
+                          className="h-[170px] w-full object-cover bg-slate-200"
+                        />
+                      </Link>
+
+                      <button
+                        onClick={() => handleDeleteFavorite(favorite)}
+                        className="absolute top-4 right-4 w-10 h-10 rounded-2xl bg-white/90 text-red-500 flex items-center justify-center shadow hover:bg-red-50"
+                        title="Hapus favorite"
+                      >
+                        <Trash2 size={18} />
+                      </button>
+
+                      <div className="p-6 flex-1 flex flex-col">
+                        <span className="text-[11px] font-bold uppercase text-[#10BB89] flex items-center gap-1 mb-3">
+                          <ChefHat size={14} /> {recipe.category || "Resep sehat"}
+                        </span>
+
+                        <Link to={`/dashboard/recipes/${recipe.id}`}>
+                          <h3 className="text-[18px] leading-snug font-black text-black mb-4 line-clamp-2 hover:text-[#10BB89]">
+                            {recipe.title}
+                          </h3>
+                        </Link>
+
+                        <p className="text-[12px] leading-relaxed text-black/80 line-clamp-4">
+                          {stripText(recipe.details)}
+                        </p>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+          </div>
         </div>
       )}
     </section>

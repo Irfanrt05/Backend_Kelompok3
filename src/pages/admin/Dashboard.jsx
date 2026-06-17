@@ -1,6 +1,7 @@
 import { useEffect, useState, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import api from "../../services/api";
+import {formatDateIndonesia} from "../../utils/dateTime";
 import {
   Users,
   Newspaper,
@@ -146,10 +147,7 @@ export default function Dashboard() {
                   {log.activity || log.action_description}
                 </p>
                 <span className="text-[10px] text-slate-400">
-                  {new Date(log.created_at).toLocaleTimeString([], {
-                    hour: "2-digit",
-                    minute: "2-digit",
-                  })}
+                  {formatDateIndonesia(log.createdAt || log.created_at)}
                 </span>
               </div>
             ))}

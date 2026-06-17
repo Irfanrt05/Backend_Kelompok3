@@ -102,10 +102,9 @@ export default function Login() {
           <div
             className="w-full flex flex-col justify-center"
             style={{
-              background: "rgba(226, 232, 240, 0.65)",
               borderRadius: "24px",
               padding: "24px 20px",
-              border: "1px solid rgba(148, 163, 184, 0.35)",
+              border: "1px solid ",
               backdropFilter: "blur(20px)",
               WebkitBackdropFilter: "blur(20px)",
               boxShadow:

@@ -51,7 +51,7 @@ export default function UserProfile() {
 
   return (
     <div className="grid grid-cols-[280px_1fr] gap-6 min-h-[calc(100vh-160px)]">
-      <aside className="bg-white p-4 h-[116px]">
+      <aside className="bg-white p-4 h-[116px] rounded-2xl">
         <button className="flex items-center gap-4 text-black text-lg font-medium py-3 px-2">
           <UserRound size={22} /> Pengaturan Akun
         </button>
@@ -60,7 +60,7 @@ export default function UserProfile() {
         </button>
       </aside>
 
-      <section className="bg-white min-h-[760px] px-16 py-10">
+      <section className="bg-white min-h-[760px] px-16 py-10 rounded-2xl">
         <div className="flex items-center gap-8">
           <div className="relative">
             <img
